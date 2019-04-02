@@ -18,7 +18,7 @@ ng serve
 
 Add the package as a dependency to your project using:
 
-    npm install --save fvi-angular-mentions
+    npm install --save rob-angular-mentions
 
 Add the CSS to your index.html:
 

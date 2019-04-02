@@ -1,5 +1,5 @@
-import { Directive, ElementRef, Input, ComponentFactoryResolver, ViewContainerRef, TemplateRef } from "@angular/core";
-import { EventEmitter, Output, OnInit, OnChanges, SimpleChanges } from "@angular/core";
+import { Directive, ElementRef, Input, ComponentFactoryResolver, ViewContainerRef, TemplateRef } from '@angular/core';
+import { EventEmitter, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
 import { MentionListComponent } from './mention-list.component';
 import { getValue, insertValue, getCaretPosition, setCaretPosition } from './mention-utils';
@@ -10,12 +10,10 @@ const KEY_TAB = 9;
 const KEY_ENTER = 13;
 const KEY_SHIFT = 16;
 const KEY_ESCAPE = 27;
-const KEY_SPACE = 32;
 const KEY_LEFT = 37;
 const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
-const KEY_2 = 50;
 
 /**
  * Angular 2 Mentions.
@@ -49,28 +47,24 @@ export class MentionDirective implements OnInit, OnChanges {
   @Output() triggeredChar = new EventEmitter<string>();
 
   // the character that will trigger the menu behavior
-  private defaultTriggerChar: string = "@";
+  private defaultTriggerChar = '@';
 
   // option to specify the field in the objects to be used as the item label
-  private defaultLabelKey: string = 'label';
+  private defaultLabelKey = 'label';
 
   // option to diable internal filtering. can be used to show the full list returned
   // from an async operation (or allows a custom filter function to be used - in future)
-  private defaultDisableSearch: boolean = false;
+  private defaultDisableSearch = false;
 
   // option to limit the number of items shown in the pop-up menu
-  private defaultMaxItems: number = -1;
+  private defaultMaxItems = -1;
 
   // Function formatter
   // private mentionSelect = function (item) { return this.lastMentionItem.triggerChar + this.lastMentionItem.searchList.activeItem[this.lastMentionItem.labelKey]; };
-  //v0.10.0
-  //private mentionSelect: (item: any) => (string) = (item: any) => this.lastMentionItem.triggerChar + item[this.lastMentionItem.labelKey];
-  //v0.9.3
-  //private mentionSelect = function (item) { return this.lastMentionItem.triggerChar + this.lastMentionItem.searchList.activeItem[this.lastMentionItem.labelKey]; };
-  //v0.10.2
   private mentionSelect: (item: any) => (string) = ((item: any) => {
     return this.lastMentionItem.triggerChar + item[this.lastMentionItem.labelKey];
   });
+
   searchString: string;
   startPos: number;
   mentionItems: Array<MentionItem>
@@ -88,22 +82,21 @@ export class MentionDirective implements OnInit, OnChanges {
   ) { }
 
   setMentionItemDefaults() {
-    for (let mentionItem of this.mentionItems) {
+    for (const mentionItem of this.mentionItems) {
       mentionItem.triggerChar = mentionItem.triggerChar !== null ? mentionItem.triggerChar : this.defaultTriggerChar;
 
       mentionItem.labelKey = mentionItem.labelKey || this.defaultLabelKey;
       mentionItem.disableSearch = mentionItem.disableSearch || this.defaultDisableSearch;
       mentionItem.maxItems = mentionItem.maxItems || this.defaultMaxItems;
-      //v0.10.2
-     // mentionItem.mentionSelect = mentionItem.mentionSelect || this.mentionSelect;
+      // mentionItem.mentionSelect = mentionItem.mentionSelect || this.mentionSelect;
     }
   }
 
   convertStringsToObjects() {
-    for (let mentionItem of this.mentionItems) {
+    for (const mentionItem of this.mentionItems) {
       if (typeof mentionItem.items[0] == 'string') {
         mentionItem.items = mentionItem.items.map((label) => {
-          let object = {};
+          const object = {};
           object[mentionItem.labelKey] = label;
           return object;
         });
@@ -119,7 +112,7 @@ export class MentionDirective implements OnInit, OnChanges {
     this.setMentionItemDefaults();
     this.convertStringsToObjects();
 
-    this.setEmptyTrigger();
+    this.setEmptyTrigger(false);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -128,11 +121,11 @@ export class MentionDirective implements OnInit, OnChanges {
     }
   }
 
-  setEmptyTrigger(): void {
+  setEmptyTrigger(show: boolean = true): void {
     if (this.withEmptyTrigger) {
-      this.lastMentionItem = this.mentionItems.find((item) => item.triggerChar === "");
+      this.lastMentionItem = this.mentionItems.find((item) => item.triggerChar === '');
 
-      if (this.lastMentionItem) {
+      if (this.lastMentionItem && show) {
         this.showSearchList(this.lastMentionItem, this._element.nativeElement);
         this.updateSearchList(this.lastMentionItem);
       }
@@ -144,7 +137,7 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   stopEvent(event: any) {
-    //if (event instanceof KeyboardEvent) { // does not work for iframe
+    // if (event instanceof KeyboardEvent) { // does not work for iframe
     if (!event.wasClick) {
       event.preventDefault();
       event.stopPropagation();
@@ -161,25 +154,20 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    let val: string = getValue(nativeElement);
+    const val: string = getValue(nativeElement);
     let pos = getCaretPosition(nativeElement, this.iframe);
     let charPressed = this.keyCodeSpecified ? event.keyCode : event.key;
     if (!charPressed) {
-      let charCode = event.which || event.keyCode;
+      const charCode = event.which || event.keyCode;
       if (!event.shiftKey && (charCode >= 65 && charCode <= 90)) {
         charPressed = String.fromCharCode(charCode + 32);
-      }
-      // TODO wut?
-      // else if (event.shiftKey && charCode === KEY_2) {
-      //   charPressed = this.triggerChar;
-      // }
-      else {
+      } else {
         // TODO (dmacfarlane) fix this for non-alpha keys
         // http://stackoverflow.com/questions/2220196/how-to-decode-character-pressed-from-jquerys-keydowns-event-handler?lq=1
         charPressed = String.fromCharCode(event.which || event.keyCode);
       }
     }
-    if (event.keyCode == KEY_ENTER && event.wasClick && pos < this.startPos) {
+    if ((event.keyCode == KEY_TAB || (event.keyCode == KEY_ENTER && event.wasClick)) && pos < this.startPos) {
       // put caret back in position prior to contenteditable menu click
       pos = this.startNode.length;
       setCaretPosition(this.startNode, pos, this.iframe);
@@ -188,58 +176,69 @@ export class MentionDirective implements OnInit, OnChanges {
 
     let mentionItem: MentionItem = this.getMentionItemFromCharPressed(charPressed);
 
-    if (mentionItem) {
+    if (!mentionItem && charPressed !== ' ' && charPressed !== null && this.withEmptyTrigger && !nativeElement.value
+      && event.keyCode !== KEY_ENTER && !event.wasClick && event.keyCode !== KEY_TAB
+      && event.keyCode !== KEY_DOWN && event.keyCode !== KEY_UP) {
+      mentionItem = this.getMentionItemFromCharPressed('');
+    }
+
+    if ((mentionItem && charPressed !== ' ') || (mentionItem && charPressed === ' ' &&
+      (nativeElement.value.endsWith(',') || nativeElement.value.endsWith('+')))) {
       this.lastMentionItem = mentionItem;
 
+      if (charPressed !== ' ' && charPressed !== null && this.withEmptyTrigger && !nativeElement.value) {
+        this.stopSearch = false;
+        this.searchString = charPressed;
+      } else {
+        this.stopSearch = false;
+        this.searchString = null;
+      }
       // if (charPressed == this.triggerChar) {
       this.startPos = pos;
       this.startNode = (this.iframe ? this.iframe.contentWindow.getSelection() : window.getSelection()).anchorNode;
-      this.stopSearch = false;
-      this.searchString = null;
+
       this.showSearchList(mentionItem, nativeElement);
       this.updateSearchList(mentionItem);
-    }
-    else if ((this.startPos >= 0 && !this.stopSearch) ||
+    } else if ((this.startPos >= 0 && !this.stopSearch) ||
       this.withEmptyTrigger) {
 
-      if (this.startPos === 0 && this.withEmptyTrigger && this.lastMentionItem.triggerChar === "" && event.keyCode !== KEY_ENTER &&
-        !event.wasClick) {
+      if (this.startPos === 0 && this.withEmptyTrigger && this.lastMentionItem.triggerChar === ''
+        && event.keyCode !== KEY_ENTER && event.keyCode !== KEY_TAB && event.keyCode !== KEY_DOWN
+        && event.keyCode !== KEY_UP && !event.wasClick) {
         this.searchString = nativeElement.value + charPressed;
         this.setEmptyTrigger();
-      } else if (pos <= this.startPos) {
+      } else if (pos <= this.startPos && !this.withEmptyTrigger) {
         this.lastMentionItem.searchList.hidden = true;
-      }
-      // ignore shift when pressed alone, but not when used with another key
-      else if (event.keyCode !== KEY_SHIFT &&
+      } else if (event.keyCode !== KEY_SHIFT &&
         !event.metaKey &&
         !event.altKey &&
         !event.ctrlKey &&
         (pos > this.startPos || this.withEmptyTrigger)
       ) {
-        if (event.keyCode === KEY_SPACE) {
-          this.startPos = -1;
-        }
-        else if (event.keyCode === KEY_BACKSPACE && pos > 0) {
+        if (event.keyCode === KEY_BACKSPACE && pos > 0) {
           pos--;
           if (pos == 0) {
             this.stopSearch = true;
           }
           this.lastMentionItem.searchList.hidden = this.stopSearch;
-        }
-        else if (this.lastMentionItem && !this.lastMentionItem.searchList.hidden) {
+        } else if (this.lastMentionItem && !this.lastMentionItem.searchList.hidden) {
           if (event.keyCode === KEY_TAB || event.keyCode === KEY_ENTER) {
             this.stopEvent(event);
             this.lastMentionItem.searchList.hidden = true;
             // value is inserted without a trailing space for consistency
             // between element types (div and iframe do not preserve the space)
 
+            // if (nativeElement.value && this.lastMentionItem.triggerChar === "") {
+            //   this.startPos = nativeElement.value.lastIndexOf(charPressed.trim());
+            //   pos = nativeElement.value.lastIndexOf(charPressed.trim());
+            // }
             // if mentionSelect is overridden
             if (!this.iframe && (this.startPos < 0 || this.startPos === undefined)) {
               this.startPos = 0;
               pos = this.lastMentionItem.searchList.activeItem[this.lastMentionItem.searchList.labelKey] ?
-                  this.lastMentionItem.searchList.activeItem[this.lastMentionItem.searchList.labelKey].length + 1
-                  : 0;
-          }
+                this.lastMentionItem.searchList.activeItem[this.lastMentionItem.searchList.labelKey].length + 1
+                : 0;
+            }
 
             if (this.lastMentionItem.mentionSelect) {
               insertValue(nativeElement, this.startPos, pos, this.lastMentionItem.mentionSelect(this.lastMentionItem.searchList.activeItem), this.iframe);
@@ -247,33 +246,30 @@ export class MentionDirective implements OnInit, OnChanges {
               // default method
               insertValue(nativeElement, this.startPos, pos, this.mentionSelect(this.lastMentionItem.searchList.activeItem), this.iframe);
             }
-            //v0.9.3
-            //insertValue(nativeElement, this.startPos, pos, this.mentionSelect(this.lastMentionItem.searchList.activeItem), this.iframe);
-            //v0.10.0
-            //insertValue(nativeElement, this.startPos, pos, this.lastMentionItem.mentionSelect(this.lastMentionItem.searchList.activeItem), this.iframe);
 
             this.selectedTerm.emit(this.lastMentionItem.searchList.activeItem);
             // fire input event so angular bindings are updated
-            if ("createEvent" in document) {
-              var evt = document.createEvent("HTMLEvents");
-              evt.initEvent("input", false, true);
+            if ('createEvent' in document) {
+              const evt = document.createEvent('HTMLEvents');
+              evt.initEvent('input', false, true);
               nativeElement.dispatchEvent(evt);
             }
             this.startPos = -1;
+
+            // if (this.withEmptyTrigger) {
+            //   this.setEmptyTrigger();
+            // }
             return false;
-          }
-          else if (event.keyCode === KEY_ESCAPE) {
+          } else if (event.keyCode === KEY_ESCAPE) {
             this.stopEvent(event);
             this.lastMentionItem.searchList.hidden = true;
             this.stopSearch = true;
             return false;
-          }
-          else if (event.keyCode === KEY_DOWN) {
+          } else if (event.keyCode === KEY_DOWN) {
             this.stopEvent(event);
             this.lastMentionItem.searchList.activateNextItem();
             return false;
-          }
-          else if (event.keyCode === KEY_UP) {
+          } else if (event.keyCode === KEY_UP) {
             this.stopEvent(event);
             this.lastMentionItem.searchList.activatePreviousItem();
             return false;
@@ -283,8 +279,7 @@ export class MentionDirective implements OnInit, OnChanges {
         if (event.keyCode === KEY_LEFT || event.keyCode === KEY_RIGHT) {
           this.stopEvent(event);
           return false;
-        }
-        else {
+        } else {
           let mention = val.substring(this.startPos + 1, pos);
           if (event.keyCode !== KEY_BACKSPACE) {
             mention += charPressed;
@@ -293,7 +288,8 @@ export class MentionDirective implements OnInit, OnChanges {
           this.searchString = mention;
           this.searchTerm.emit(this.searchString);
 
-          if (event.keyCode === KEY_BACKSPACE && this.withEmptyTrigger && (pos === 0 || mention === "")) {
+          if (event.keyCode === KEY_BACKSPACE && this.withEmptyTrigger && (pos === 0 || mention === '') &&
+            (nativeElement.value.endsWith(' ') || nativeElement.value.endsWith(','))) {
             this.setEmptyTrigger();
           }
 
@@ -305,15 +301,7 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   getMentionItemFromCharPressed(charPressed) {
-    let mentioned = null;
-
-    for (let mentionItem of this.mentionItems) {
-      if (charPressed == mentionItem.triggerChar) {
-        mentioned = mentionItem;
-      }
-    }
-
-    return mentioned;
+    return this.mentionItems.find((mention) => mention.triggerChar === charPressed);
   }
 
   updateSearchList(mentionItem: MentionItem) {
@@ -322,7 +310,7 @@ export class MentionDirective implements OnInit, OnChanges {
       let objects = mentionItem.items;
       // disabling the search relies on the async operation to do the filtering
       if (!mentionItem.disableSearch && this.searchString) {
-        let searchStringLowerCase = this.searchString.toLowerCase();
+        const searchStringLowerCase = this.searchString.toLowerCase();
         objects = mentionItem.items.filter(e => e[mentionItem.labelKey].toLowerCase().startsWith(searchStringLowerCase));
       }
       matches = objects;
@@ -338,26 +326,26 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   showSearchList(mentionItem: MentionItem, nativeElement: HTMLInputElement) {
-    for (let listedItem of this.mentionItems) {
-      if (listedItem.searchList)
+    for (const listedItem of this.mentionItems) {
+      if (listedItem.searchList) {
         listedItem.searchList.hidden = true;
+      }
     }
 
     if (mentionItem.searchList == null) {
-      let componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
-      let componentRef = this._viewContainerRef.createComponent(componentFactory);
+      const componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
+      const componentRef = this._viewContainerRef.createComponent(componentFactory);
       mentionItem.searchList = componentRef.instance;
       mentionItem.searchList.position(nativeElement, this.iframe);
       mentionItem.searchList.itemTemplate = mentionItem.mentionListTemplate;
       mentionItem.searchList.labelKey = mentionItem.labelKey;
       componentRef.instance['itemClick'].subscribe(() => {
         nativeElement.focus();
-        let fakeKeydown = { "keyCode": KEY_ENTER, "wasClick": true };
+        const fakeKeydown = { 'keyCode': KEY_ENTER, 'wasClick': true };
         this.keyHandler(fakeKeydown, nativeElement);
       });
       this.triggeredChar.emit(mentionItem.triggerChar);
-    }
-    else {
+    } else {
       mentionItem.searchList.activeIndex = 0;
       mentionItem.searchList.position(nativeElement, this.iframe);
       window.setTimeout(() => mentionItem.searchList.resetScroll());

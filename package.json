@@ -1,19 +1,19 @@
 {
-  "name": "fvi-angular-mentions",
-  "version": "0.10.4",
+  "name": "rob-angular-mentions",
+  "version": "1.0.0",
   "description": "Angular mentions from Dmacfarlane - angular-mentions and devel branch of Dessalines. Modified version of angular-mentions that has an optional function to format the selected item before inserting the text.",
   "keywords": [
     "angular",
     "mention",
-	"multiple mention",
+    "multiple mention",
     "autocomplete"
   ],
   "main": "mention/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/francisvgi/fvi-angular-mentions.git"
+    "url": "https://github.com/rob-moore/rob-angular-mentions.git"
   },
-  "author": "Francis Ilagan",
+  "author": "Rob Moore",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
@@ -65,6 +65,6 @@
     "mention"
   ],
   "exclude": [
-	"src/mention/index.ts"
+    "src/mention/index.ts"
   ]
 }
