@@ -14,6 +14,7 @@ const KEY_LEFT = 37;
 const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
+const KEY_BUFFERED = 229;
 
 /**
  * Angular 2 Mentions.
@@ -25,6 +26,7 @@ const KEY_DOWN = 40;
   selector: '[mentions]',
   host: {
     '(keydown)': 'keyHandler($event)',
+    '(textInput)': 'textInputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
 })
@@ -70,6 +72,7 @@ export class MentionDirective implements OnInit, OnChanges {
   mentionItems: Array<MentionItem>
   startNode;
   stopSearch: boolean;
+  lastKeyCode: number;
   iframe: any; // optional
   keyCodeSpecified: boolean;
   lastMentionItem: MentionItem;
@@ -107,6 +110,14 @@ export class MentionDirective implements OnInit, OnChanges {
       mentionItem.items.sort((a, b) => a[mentionItem.labelKey].localeCompare(b[mentionItem.labelKey]));
     }
   }
+
+  textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.lastKeyCode === KEY_BUFFERED) {
+      let keyCode = event.data.charCodeAt(0);
+      this.keyHandler({keyCode:keyCode}, nativeElement);
+    }
+  }
+
 
   ngOnInit() {
     this.setMentionItemDefaults();
@@ -154,6 +165,7 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    this.lastKeyCode = event.keyCode;
     const val: string = getValue(nativeElement);
     let pos = getCaretPosition(nativeElement, this.iframe);
     let charPressed = this.keyCodeSpecified ? event.keyCode : event.key;
