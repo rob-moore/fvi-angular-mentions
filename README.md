@@ -1,11 +1,18 @@
-# Angular Mentions - Francis fork
+# Angular Mentions - Rob fork
 
 
 Forked from [dmacfarlane/angular-mentions](https://github.com/dmacfarlane/angular-mentions)
 
 Forked from [dessalines/angular-mentions](https://github.com/dessalines/angular-mentions)
 
+Forked from [francisvgi/fvi-angular-mentions](https://github.com/francisvgi/fvi-angular-mentions)
+
 Angular mentions inspired by [Ment.io](https://github.com/jeff-collins/ment.io).
+
+This fork fixes several bugs that were present in older forks. The fixed bug list includes:
+
+* Fixed issue with android keyboard causing mentions to not funciton at all on android.
+* Fixed issue that prevented the mentions list from opening if the user deletes part of the entry.
 
 Provides auto-complete suggestions for @mentions in text input fields, text areas,
 and content editable fields. Not fully browser tested and comes without warranty!
