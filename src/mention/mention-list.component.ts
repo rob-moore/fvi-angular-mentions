@@ -35,11 +35,11 @@ import { getCaretCoordinates } from './caret-coords';
       {{item[labelKey]}}
     </ng-template>
     <ul #list [hidden]="hidden" class="dropdown-menu scrollable-menu">
+      <a class="dropdown-item" (mousedown)="activeIndex=i;itemClick.emit();$event.preventDefault()">
         <li *ngFor="let item of items; let i = index" [class.active]="activeIndex==i">
-            <a class="dropdown-item" (mousedown)="activeIndex=i;itemClick.emit();$event.preventDefault()">
-              <ng-template [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{'item':item}"></ng-template>
-            </a>
+            <ng-template [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{'item':item}"></ng-template>
         </li>
+      </a>
     </ul>
     `
 })
