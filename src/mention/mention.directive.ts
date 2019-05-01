@@ -112,7 +112,7 @@ export class MentionDirective implements OnInit, OnChanges {
   }
 
   textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    if (this.lastKeyCode === KEY_BUFFERED) {
+    if (this.lastKeyCode === KEY_BUFFERED && event.data) {
       let keyCode = event.data.charCodeAt(0);
       this.keyHandler({keyCode:keyCode}, nativeElement);
     }
@@ -166,6 +166,9 @@ export class MentionDirective implements OnInit, OnChanges {
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
     this.lastKeyCode = event.keyCode;
+    if (event.isComposing || event.keyCode === KEY_BUFFERED) {
+      return;
+    }
     const val: string = getValue(nativeElement);
     let pos = getCaretPosition(nativeElement, this.iframe);
     let charPressed = this.keyCodeSpecified ? event.keyCode : event.key;
