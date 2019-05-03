@@ -14,7 +14,7 @@ const KEY_LEFT = 37;
 const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
-const KEY_BUFFERED = 229;
+const KEY_ANDROID = 229;
 
 /**
  * Angular 2 Mentions.
@@ -26,7 +26,7 @@ const KEY_BUFFERED = 229;
   selector: '[mentions]',
   host: {
     '(keydown)': 'keyHandler($event)',
-    '(textInput)': 'textInputHandler($event)',
+    '(input)': 'textInputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
 })
@@ -111,10 +111,10 @@ export class MentionDirective implements OnInit, OnChanges {
     }
   }
 
-  textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    if (this.lastKeyCode === KEY_BUFFERED && event.data) {
+  inputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.lastKeyCode === KEY_ANDROID && event.data) {
       let keyCode = event.data.charCodeAt(0);
-      this.keyHandler({keyCode:keyCode}, nativeElement);
+      this.keyHandler({keyCode, inputEvent: true}, nativeElement);
     }
   }
 
@@ -166,7 +166,7 @@ export class MentionDirective implements OnInit, OnChanges {
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
     this.lastKeyCode = event.keyCode;
-    if (event.isComposing || event.keyCode === KEY_BUFFERED) {
+    if (event.isComposing || event.keyCode === KEY_ANDROID) {
       return;
     }
     const val: string = getValue(nativeElement);
@@ -209,7 +209,7 @@ export class MentionDirective implements OnInit, OnChanges {
         this.searchString = null;
       }
       // if (charPressed == this.triggerChar) {
-      this.startPos = pos;
+      this.startPos = event.inputEvent ? pos - 1: pos;
       this.startNode = (this.iframe ? this.iframe.contentWindow.getSelection() : window.getSelection()).anchorNode;
 
       this.showSearchList(mentionItem, nativeElement);
@@ -296,7 +296,7 @@ export class MentionDirective implements OnInit, OnChanges {
           return false;
         } else {
           let mention = val.substring(this.startPos + 1, pos);
-          if (event.keyCode !== KEY_BACKSPACE) {
+          if (event.keyCode !== KEY_BACKSPACE && !event.inputEvent) {
             mention += charPressed;
           }
 
@@ -356,7 +356,7 @@ export class MentionDirective implements OnInit, OnChanges {
       mentionItem.searchList.labelKey = mentionItem.labelKey;
       componentRef.instance['itemClick'].subscribe(() => {
         nativeElement.focus();
-        const fakeKeydown = { 'keyCode': KEY_ENTER, 'wasClick': true };
+        const fakeKeydown = { keyCode: KEY_ENTER, wasClick: true };
         this.keyHandler(fakeKeydown, nativeElement);
       });
       this.triggeredChar.emit(mentionItem.triggerChar);
