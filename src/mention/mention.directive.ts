@@ -17,16 +17,16 @@ const KEY_DOWN = 40;
 const KEY_ANDROID = 229;
 
 /**
- * Angular 2 Mentions.
+ * Rob Angular 2 Mentions.
  * https://github.com/dmacfarlane/angular-mentions
  *
- * Copyright (c) 2017 Dan MacFarlane
+ * Copyright (c) 2019 Rob Moore
  */
 @Directive({
   selector: '[mentions]',
   host: {
     '(keydown)': 'keyHandler($event)',
-    '(input)': 'textInputHandler($event)',
+    '(input)': 'inputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
 })
